@@ -14,7 +14,7 @@ const JobSchema = mongoose.Schema(
     imageUrl: { type: "String", required: true },
     agentId: { type: "String", required: true },
   },
-  { timestamps: tru }
+  { timestamps: true}
 );
 
 module.exports = mongoose.model("Job", JobSchema);

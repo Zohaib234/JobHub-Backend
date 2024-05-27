@@ -1,4 +1,4 @@
-const Job = require("../models/Job");
+const Job = require('../models/Job');
 
 module.exports = {
   createJob: async (req, res) => {
@@ -53,11 +53,52 @@ module.exports = {
     const jobId = req.params.id;
 
     try {
-      const getJob = await Job.findById(jobId);
+      const getJob = await Job.findById(
+        { _id: jobId },
+        { createdAt: 0, updatedAt: 0, __v: 0 }
+      );
       if (!getJob) {
         res.status(404).json({ status: false, message: "Job not found" });
       }
       res.status(200).json({ status: "success", data: getJob });
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
+  getAllJobs: async (req, res) => {
+    const recent = req.query.new;
+
+    try {
+      let jobs;
+      if (recent) {
+        jobs = await Job.findById({}, { createdAt: 0, updatedAt: 0, __v: 0 })
+          .sort({ createdAt: -1 })
+          .limit(2);
+      } else {
+        jobs = await Job.findById({}, { createdAt: 0, updatedAt: 0, __v: 0 });
+      }
+      res.status(200).json(jobs);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  },
+
+  searchJobs: async (req, res) => {
+    try {
+      const results = await Job.aggregate([
+        {
+          $search: {
+            index: "jobsearch",
+            text: {
+              query: req.params.key,
+              path: {
+                wildcard: "*"
+              }
+            }
+          }
+        }
+      ]);
+      res.status(200).json(results);
     } catch (error) {
       res.status(500).json(error);
     }
