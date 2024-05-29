@@ -1,4 +1,4 @@
-const Job = require('../models/Job');
+const Job = require("../models/Job");
 
 module.exports = {
   createJob: async (req, res) => {
@@ -60,22 +60,22 @@ module.exports = {
       if (!getJob) {
         res.status(404).json({ status: false, message: "Job not found" });
       }
-      res.status(200).json({ status: "success", data: getJob });
+      res.status(200).json(getJob);
     } catch (error) {
       res.status(500).json(error);
     }
   },
   getAllJobs: async (req, res) => {
-    const recent = req.query.new;
-
+    const recent = req.query.new === 'true';
+  
     try {
       let jobs;
       if (recent) {
-        jobs = await Job.findById({}, { createdAt: 0, updatedAt: 0, __v: 0 })
-          .sort({ createdAt: -1 })
-          .limit(2);
+        jobs = await Job.find({}, { createdAt: 0, updatedAt: 0, __v: 0 })
+         .sort({ createdAt: -1 })
+         .limit(2);
       } else {
-        jobs = await Job.findById({}, { createdAt: 0, updatedAt: 0, __v: 0 });
+        jobs = await Job.find({}, { createdAt: 0, updatedAt: 0, __v: 0 });
       }
       res.status(200).json(jobs);
     } catch (error) {
@@ -92,11 +92,11 @@ module.exports = {
             text: {
               query: req.params.key,
               path: {
-                wildcard: "*"
-              }
-            }
-          }
-        }
+                wildcard: "*",
+              },
+            },
+          },
+        },
       ]);
       res.status(200).json(results);
     } catch (error) {
